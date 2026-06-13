@@ -7,17 +7,22 @@ export default function Navbar() {
   // Define navigation items dynamically based on role
   const getNavItems = () => {
     const items = [{ id: 'landing', label: 'Home' }];
-    
+
     // Both guest and authenticated roles get the map
     items.push({ id: 'map', label: 'Library Map' });
-    
-    // Student Portal page is removed, students manage bookings directly from the Map
+
+    // Students get a dedicated QR scanner page
+    if (userRole === 'student') {
+      items.push({ id: 'scanner', label: 'Scan QR' });
+    }
+
     if (userRole === 'librarian') {
       items.push({ id: 'librarian', label: 'Librarian Panel' });
     }
-    
+
     return items;
   };
+
 
   const navItems = getNavItems();
 
