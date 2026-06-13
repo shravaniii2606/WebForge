@@ -20,6 +20,7 @@ export default function LibraryMapScreen() {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState('');
   const [reportSuccess, setReportSuccess] = useState('');
+  const isReportingComplaint = isReportOpen && userRole === 'student';
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -107,7 +108,7 @@ export default function LibraryMapScreen() {
           <p className="text-slate-400 text-sm mt-1">
             Real-time seat availability.{' '}
             {userRole === 'librarian' && <span className="text-red-400 font-bold ml-1">Librarian Override mode active.</span>}
-            {userRole === 'student' && (
+            {userRole === 'student' && !isReportingComplaint && (
               <button
                 onClick={() => setCurrentView('scanner')}
                 className="ml-2 inline-flex items-center gap-1 text-primary-400 hover:text-primary-300 font-semibold transition underline underline-offset-2"
@@ -376,7 +377,7 @@ export default function LibraryMapScreen() {
               <div className="border-t border-navy-800 pt-6 space-y-3">
 
                 {/* FREE desk — student view */}
-                {selectedDesk.status === 'free' && userRole === 'student' && (
+                {selectedDesk.status === 'free' && userRole === 'student' && !isReportingComplaint && (
                   <div className="space-y-3">
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
                       <p className="text-xs font-semibold text-emerald-400 mb-1">This desk is available!</p>
@@ -417,7 +418,7 @@ export default function LibraryMapScreen() {
                 )}
 
                 {/* Student's own desk actions */}
-                {isMyDesk && (
+                {isMyDesk && !isReportingComplaint && (
                   <div className="space-y-3 p-3 bg-navy-900 border border-navy-800 rounded-xl">
                     <span className="block text-[9px] uppercase font-bold text-primary-400 tracking-wider text-center">Seat Actions</span>
                     {selectedDesk.status === 'occupied' && (
@@ -479,7 +480,7 @@ export default function LibraryMapScreen() {
                   Click any seat on the floor plan to inspect its status.
                 </p>
               </div>
-              {userRole === 'student' && (
+              {userRole === 'student' && !isReportingComplaint && (
                 <button
                   onClick={() => setCurrentView('scanner')}
                   className="mt-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-400 text-navy-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-primary-500/20 transition"
