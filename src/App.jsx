@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import LandingScreen from './components/LandingScreen';
 import LibraryMapScreen from './components/LibraryMapScreen';
 import StudentCheckInScreen from './components/StudentCheckInScreen';
+import LibrarianDashboard from './components/LibrarianDashboard';
 import StillHereModal from './components/StillHereModal';
 import DemoPanel from './components/DemoPanel';
 
