@@ -3,6 +3,7 @@ import { DeskProvider, useDesks } from './context/DeskContext';
 import Navbar from './components/Navbar';
 import LandingScreen from './components/LandingScreen';
 import LibraryMapScreen from './components/LibraryMapScreen';
+import ScannerScreen from './components/ScannerScreen';
 import StudentCheckInScreen from './components/StudentCheckInScreen';
 import LibrarianDashboard from './components/LibrarianDashboard';
 import StillHereModal from './components/StillHereModal';
@@ -17,6 +18,8 @@ function MainAppContent() {
         return <LandingScreen />;
       case 'map':
         return <LibraryMapScreen />;
+      case 'scanner':
+        return <ScannerScreen />;
       case 'student-flow':
         return <StudentCheckInScreen />;
       case 'librarian':
