@@ -217,21 +217,6 @@ export default function LandingScreen() {
           )}
         </div>
 
-        {/* 3-Point Value Props */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          <div className="bg-navy-850/60 backdrop-blur-sm p-6 rounded-2xl border border-navy-800">
-            <h3 className="text-lg font-bold text-white mb-2">Auto-Expiry Warnings</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Seat bookings are backed by intelligent timers. If a student leaves or goes away for too long, the seat resets automatically.
-            </p>
-          </div>
-          <div className="bg-navy-850/60 backdrop-blur-sm p-6 rounded-2xl border border-navy-800">
-            <h3 className="text-lg font-bold text-white mb-2">Live Seat Control</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Integrated desk sensors verify student presence. System flags idle desks to the librarian to free them for others.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Info Footer */}
