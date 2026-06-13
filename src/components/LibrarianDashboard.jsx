@@ -5,6 +5,7 @@ export default function LibrarianDashboard() {
   const {
     desks,
     triggers,
+    complaints,
     stats,
     resetDesk,
     resetAllOccupied,
@@ -239,6 +240,53 @@ export default function LibrarianDashboard() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Student complaints */}
+      <div className="mt-8 bg-navy-850 border border-navy-800 rounded-2xl overflow-hidden shadow-md">
+        <div className="px-6 py-5 border-b border-navy-800 bg-navy-900/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="font-bold text-white text-lg">Student Complaints</h3>
+            <p className="text-[10px] text-slate-400 mt-1 uppercase font-semibold tracking-wider">
+              Reports sent from student accounts
+            </p>
+          </div>
+          <span className="text-xs text-slate-400">{complaints.length} Total</span>
+        </div>
+
+        <div className="p-6">
+          {complaints.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-4">
+              {complaints.map((complaint) => (
+                <div
+                  key={complaint.id}
+                  className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-4 text-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/10 pb-3 mb-3">
+                    <div>
+                      <span className="block text-[10px] uppercase tracking-wider text-amber-300 font-bold">
+                        {complaint.studentId}
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        {complaint.date} at {complaint.time}
+                      </span>
+                    </div>
+                    {complaint.deskId && (
+                      <span className="rounded-lg border border-navy-700 bg-navy-950/60 px-2 py-1 text-[10px] font-bold text-slate-300">
+                        Desk #{complaint.deskId}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">{complaint.message}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-slate-500 text-xs">
+              No student complaints submitted yet.
+            </div>
+          )}
         </div>
       </div>
     </div>
