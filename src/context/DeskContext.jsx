@@ -63,9 +63,12 @@ const initialTriggers = [
   },
 ];
 
+const initialComplaints = [];
+
 export const DeskProvider = ({ children }) => {
   const [desks, setDesks] = useState(initialDesks);
   const [triggers, setTriggers] = useState(initialTriggers);
+  const [complaints, setComplaints] = useState(initialComplaints);
   const [currentView, setCurrentView] = useState('landing');
   const [currentStudentDesk, setCurrentStudentDesk] = useState(null); // Which desk the current student is interacting with
   const [selectedDeskId, setSelectedDeskId] = useState(null); // Selected desk details in Map modal
@@ -330,6 +333,26 @@ export const DeskProvider = ({ children }) => {
     addLog(0, 'reset', `Librarian reset all occupied desks (${occupiedDeskCount} cleared).`);
   };
 
+  const submitComplaint = (message, deskId = null) => {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      return false;
+    }
+
+    const newComplaint = {
+      id: Date.now(),
+      studentId: currentUser || 'Anonymous student',
+      deskId,
+      message: trimmedMessage,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      date: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }),
+    };
+
+    setComplaints(prev => [newComplaint, ...prev].slice(0, 50));
+    addLog(deskId || 0, 'warning', `Complaint submitted by ${newComplaint.studentId}.`);
+    return true;
+  };
+
   // Demo Helpers
   const triggerStillHereAlert = (deskId) => {
     const desk = desks.find(d => d.id === deskId);
@@ -389,6 +412,7 @@ export const DeskProvider = ({ children }) => {
       value={{
         desks,
         triggers,
+        complaints,
         currentView,
         setCurrentView,
         currentStudentDesk,
@@ -411,6 +435,7 @@ export const DeskProvider = ({ children }) => {
         releaseDesk,
         resetDesk,
         resetAllOccupied,
+        submitComplaint,
         triggerStillHereAlert,
         confirmStillHere,
       }}

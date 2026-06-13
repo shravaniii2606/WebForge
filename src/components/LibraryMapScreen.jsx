@@ -13,9 +13,13 @@ export default function LibraryMapScreen() {
     currentUser,
     setAway,
     releaseDesk,
+    submitComplaint,
   } = useDesks();
 
   const selectedDesk = desks.find((d) => d.id === selectedDeskId);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [reportText, setReportText] = useState('');
+  const [reportSuccess, setReportSuccess] = useState('');
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -81,6 +85,19 @@ export default function LibraryMapScreen() {
     userRole === 'student' &&
     selectedDesk.studentId === currentUser;
 
+  const handleSubmitReport = (e) => {
+    e.preventDefault();
+    const didSubmit = submitComplaint(reportText, selectedDeskId);
+    if (!didSubmit) {
+      return;
+    }
+
+    setReportText('');
+    setReportSuccess('Complaint sent to the librarian.');
+    setIsReportOpen(false);
+    window.setTimeout(() => setReportSuccess(''), 2500);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Page Header */}
@@ -106,21 +123,74 @@ export default function LibraryMapScreen() {
           </p>
         </div>
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-4 bg-navy-950/40 border border-navy-800 px-4 py-2.5 rounded-xl text-xs font-semibold">
-          <div className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-emerald-500 border border-emerald-400"></span>
-            <span className="text-slate-300">Free</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-red-500 border border-red-400"></span>
-            <span className="text-slate-300">Occupied</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-amber-500 border border-amber-400"></span>
-            <span className="text-slate-300">Away</span>
+        <div className="flex flex-wrap items-center gap-3">
+          {userRole === 'student' && (
+            <button
+              onClick={() => setIsReportOpen(true)}
+              className="px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500 border border-amber-500/30 hover:border-amber-500 text-amber-300 hover:text-navy-950 rounded-xl text-xs font-bold uppercase tracking-wider transition"
+            >
+              Report Complaint
+            </button>
+          )}
+          <div className="flex flex-wrap items-center gap-4 bg-navy-950/40 border border-navy-800 px-4 py-2.5 rounded-xl text-xs font-semibold">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3.5 w-3.5 rounded bg-emerald-500 border border-emerald-400"></span>
+              <span className="text-slate-300">Free</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-3.5 w-3.5 rounded bg-red-500 border border-red-400"></span>
+              <span className="text-slate-300">Occupied</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-3.5 w-3.5 rounded bg-amber-500 border border-amber-400"></span>
+              <span className="text-slate-300">Away</span>
+            </div>
           </div>
         </div>
       </div>
+
+      {reportSuccess && (
+        <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
+          {reportSuccess}
+        </div>
+      )}
+
+      {isReportOpen && userRole === 'student' && (
+        <form onSubmit={handleSubmitReport} className="mb-8 bg-navy-850 border border-navy-800 rounded-2xl p-5 shadow-md">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">Report a Complaint</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                {selectedDeskId ? `This report will include Desk #${selectedDeskId}.` : 'Select a desk first if this complaint is about a specific seat.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsReportOpen(false)}
+              className="text-slate-400 hover:text-white bg-navy-800 p-1.5 rounded-lg border border-navy-700"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <textarea
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            placeholder="Write your complaint here..."
+            className="w-full min-h-28 resize-y bg-navy-900 border border-navy-700 focus:border-amber-500 rounded-xl px-4 py-3 text-white text-sm focus:outline-none transition"
+          />
+          <div className="mt-4 flex justify-end">
+            <button
+              type="submit"
+              disabled={!reportText.trim()}
+              className="px-5 py-3 bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/10 text-navy-950 disabled:text-amber-500/30 font-bold rounded-xl text-xs uppercase tracking-wider transition disabled:cursor-not-allowed"
+            >
+              Send Complaint
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -305,7 +375,7 @@ export default function LibraryMapScreen() {
               {/* Action Section */}
               <div className="border-t border-navy-800 pt-6 space-y-3">
 
-                {/* FREE desk — students see a prompt to use the scanner page */}
+                {/* FREE desk — student view */}
                 {selectedDesk.status === 'free' && userRole === 'student' && (
                   <div className="space-y-3">
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
