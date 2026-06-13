@@ -360,39 +360,61 @@ export default function LibraryMapScreen() {
               {/* Booking Actions Simulation */}
               <div className="border-t border-navy-800 pt-6 space-y-4">
                 {selectedDesk.status === 'free' ? (
-                  <div className="space-y-4">
-                    <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl border-4 border-navy-950 shadow-inner max-w-[160px] mx-auto group relative">
-                      {/* Fake QR representation */}
-                      <svg className="w-32 h-32 text-navy-950" viewBox="0 0 100 100" fill="currentColor">
-                        <rect x="0" y="0" width="25" height="25" />
-                        <rect x="0" y="75" width="25" height="25" />
-                        <rect x="75" y="0" width="25" height="25" />
-                        <rect x="75" y="75" width="25" height="25" />
-                        <rect x="10" y="10" width="5" height="5" fill="white" />
-                        <rect x="85" y="10" width="5" height="5" fill="white" />
-                        <rect x="10" y="85" width="5" height="5" fill="white" />
-                        <rect x="35" y="35" width="30" height="30" />
-                        <rect x="35" y="10" width="10" height="15" />
-                        <rect x="10" y="35" width="15" height="10" />
-                        <rect x="55" y="75" width="10" height="15" />
-                        <rect x="75" y="55" width="15" height="10" />
-                      </svg>
-                      <span className="text-[8px] font-black text-slate-500 mt-2 tracking-wider font-sans">SCAN QR CODE AT DESK {selectedDesk.id}</span>
+                  userRole === 'librarian' ? (
+                    <div className="space-y-4">
+                      <div className="bg-navy-950/40 border border-navy-800 p-4 rounded-xl text-center">
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          Desk {selectedDesk.id} is free. Use the status dropdown above to assign or override this desk.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleLibrarianOverride(selectedDesk.id, 'occupied')}
+                        className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl transition-all duration-200 uppercase text-xs tracking-wider font-sans"
+                      >
+                        Mark Occupied
+                      </button>
+                      <button
+                        onClick={() => setCurrentView('librarian')}
+                        className="w-full py-3 bg-navy-800 hover:bg-navy-750 border border-navy-700 text-white font-semibold rounded-xl text-xs font-sans"
+                      >
+                        Control Dashboard
+                      </button>
                     </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl border-4 border-navy-950 shadow-inner max-w-[160px] mx-auto group relative">
+                        {/* Fake QR representation */}
+                        <svg className="w-32 h-32 text-navy-950" viewBox="0 0 100 100" fill="currentColor">
+                          <rect x="0" y="0" width="25" height="25" />
+                          <rect x="0" y="75" width="25" height="25" />
+                          <rect x="75" y="0" width="25" height="25" />
+                          <rect x="75" y="75" width="25" height="25" />
+                          <rect x="10" y="10" width="5" height="5" fill="white" />
+                          <rect x="85" y="10" width="5" height="5" fill="white" />
+                          <rect x="10" y="85" width="5" height="5" fill="white" />
+                          <rect x="35" y="35" width="30" height="30" />
+                          <rect x="35" y="10" width="10" height="15" />
+                          <rect x="10" y="35" width="15" height="10" />
+                          <rect x="55" y="75" width="10" height="15" />
+                          <rect x="75" y="55" width="15" height="10" />
+                        </svg>
+                        <span className="text-[8px] font-black text-slate-500 mt-2 tracking-wider font-sans">SCAN QR CODE AT DESK {selectedDesk.id}</span>
+                      </div>
 
-                    <p className="text-xs text-slate-400 text-center leading-relaxed">
-                      {userRole === 'student'
-                        ? 'Simulate scanning this desk\'s physical QR code to check in and secure your seat.'
-                        : 'Review this desk\'s QR code. Log in as a student to book or check in.'}
-                    </p>
+                      <p className="text-xs text-slate-400 text-center leading-relaxed">
+                        {userRole === 'student'
+                          ? 'Simulate scanning this desk\'s physical QR code to check in and secure your seat.'
+                          : 'Review this desk\'s QR code. Log in as a student to book or check in.'}
+                      </p>
 
-                    <button
-                      onClick={handleTriggerScanner}
-                      className="w-full py-3 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-xl shadow-lg transition-all duration-200 uppercase text-xs tracking-wider font-sans"
-                    >
-                      {userRole === 'student' ? 'Simulate QR Scan (Check-in)' : 'Log in & Scan QR'}
-                    </button>
-                  </div>
+                      <button
+                        onClick={handleTriggerScanner}
+                        className="w-full py-3 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-xl shadow-lg transition-all duration-200 uppercase text-xs tracking-wider font-sans"
+                      >
+                        {userRole === 'student' ? 'Simulate QR Scan (Check-in)' : 'Log in & Scan QR'}
+                      </button>
+                    </div>
+                  )
                 ) : isOccupiedByOther ? (
                   /* Block actions for other students */
                   <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-center space-y-2">
