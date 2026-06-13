@@ -235,7 +235,7 @@ export const DeskProvider = ({ children }) => {
       }
       setCurrentView('map'); // Route to Map after login
     } else if (role === 'librarian') {
-      setCurrentView('librarian'); // Route to Librarian panel after login
+      setCurrentView('landing'); // Keep librarians on the shared homepage after login
     }
     addLog(0, 'check_in', `Role session started: logged in as ${role} (${userId}).`);
   };
