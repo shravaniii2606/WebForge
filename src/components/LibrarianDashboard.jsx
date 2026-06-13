@@ -7,10 +7,9 @@ export default function LibrarianDashboard() {
     triggers,
     stats,
     resetDesk,
-    resetAllAbandoned,
+    resetAllOccupied,
     checkIn,
     setAway,
-    simulateHoardingSensor,
     releaseDesk,
   } = useDesks();
 
@@ -33,8 +32,6 @@ export default function LibrarianDashboard() {
         checkIn(deskId, `ST-LIBR`);
       }
       setAway(deskId);
-    } else if (newStatus === 'abandoned') {
-      simulateHoardingSensor(deskId);
     }
   };
 
@@ -45,19 +42,20 @@ export default function LibrarianDashboard() {
         <div>
           <h2 className="text-3xl font-extrabold text-white">Librarian Control Center</h2>
           <p className="text-slate-400 text-sm mt-1">
-            Monitor library seat allocation, review hoarding triggers, and override active desk configurations.
+            Monitor library seat allocation, active timers, and override desk configurations.
           </p>
         </div>
         <button
-          onClick={resetAllAbandoned}
-          className="px-6 py-3 bg-red-500 hover:bg-red-400 text-navy-950 font-bold rounded-xl shadow-lg shadow-red-500/15 transition-all duration-200 text-xs tracking-wider uppercase"
+          onClick={resetAllOccupied}
+          disabled={stats.occupied + stats.away === 0}
+          className="px-4 py-2.5 bg-red-500/10 hover:bg-red-500 disabled:hover:bg-red-500/10 border border-red-500/30 hover:border-red-500 disabled:border-red-500/10 text-red-400 hover:text-navy-950 disabled:text-red-500/30 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:cursor-not-allowed"
         >
-          Reset All Abandoned
+          Reset All Occupied
         </button>
       </div>
 
       {/* Overview stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-navy-850 p-6 rounded-2xl border border-navy-800 flex items-center justify-between shadow-md">
           <div>
             <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Total Desk Slots</span>
@@ -78,18 +76,6 @@ export default function LibrarianDashboard() {
           <div className="h-12 w-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        </div>
-
-        <div className="bg-navy-850 p-6 rounded-2xl border border-navy-800 flex items-center justify-between shadow-md">
-          <div>
-            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Abandoned Seats</span>
-            <h4 className="text-3xl font-black text-slate-400 mt-1">{stats.abandoned}</h4>
-          </div>
-          <div className="h-12 w-12 rounded-xl bg-slate-700/20 flex items-center justify-center text-slate-400 border border-slate-600/30">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
         </div>
@@ -129,10 +115,7 @@ export default function LibrarianDashboard() {
               </thead>
               <tbody>
                 {desks.map((desk) => {
-                  const isAbandoned = desk.status === 'abandoned';
-                  const rowClass = isAbandoned
-                    ? 'border-b border-navy-800/80 bg-red-950/20 hover:bg-red-950/30 transition duration-150'
-                    : 'border-b border-navy-800 hover:bg-navy-800/25 transition duration-150';
+                  const rowClass = 'border-b border-navy-800 hover:bg-navy-800/25 transition duration-150';
 
                   return (
                     <tr key={desk.id} className={rowClass}>
@@ -159,7 +142,6 @@ export default function LibrarianDashboard() {
                           <option value="free">Free</option>
                           <option value="occupied">Occupied</option>
                           <option value="away">Away</option>
-                          <option value="abandoned">Abandoned</option>
                         </select>
                       </td>
 
@@ -170,7 +152,7 @@ export default function LibrarianDashboard() {
 
                       {/* Remaining Timer */}
                       <td className="py-4 px-6">
-                        {desk.status !== 'free' && desk.status !== 'abandoned' ? (
+                        {desk.status !== 'free' ? (
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-white font-bold">{formatTime(desk.timer)}</span>
                             <span className="text-[10px] text-slate-500">
@@ -213,7 +195,7 @@ export default function LibrarianDashboard() {
           <div className="px-6 py-5 border-b border-navy-800 bg-navy-900/40">
             <h3 className="font-bold text-white text-lg">Student Trigger Alerts</h3>
             <p className="text-[10px] text-slate-400 mt-1 uppercase font-semibold tracking-wider">
-              Automatic Sensor Logs & User Triggers
+              Session Logs
             </p>
           </div>
 
@@ -221,9 +203,7 @@ export default function LibrarianDashboard() {
             {triggers.length > 0 ? (
               triggers.map((log) => {
                 let alertColor = 'border-slate-800 bg-navy-900/50 text-slate-300';
-                if (log.type === 'abandoned') {
-                  alertColor = 'border-red-500/20 bg-red-950/10 text-red-300';
-                } else if (log.type === 'warning') {
+                if (log.type === 'warning') {
                   alertColor = 'border-amber-500/20 bg-amber-950/15 text-amber-300';
                 } else if (log.type === 'check_in') {
                   alertColor = 'border-emerald-500/20 bg-emerald-950/10 text-emerald-300';
@@ -240,7 +220,6 @@ export default function LibrarianDashboard() {
                         {log.type === 'away' && '⏳ Away'}
                         {log.type === 'release' && '🔓 Released'}
                         {log.type === 'warning' && '⚠️ Alert Warning'}
-                        {log.type === 'abandoned' && '🛑 Hoarding Flagged'}
                         {log.type === 'reset' && '🔄 Hard Reset'}
                       </span>
                       <span className="font-mono text-[9px] opacity-50">{log.time}</span>

@@ -49,7 +49,7 @@ export default function StillHereModal() {
             </span>
           </div>
           <p className="text-[11px] text-red-400/80 italic font-medium px-4">
-            If you do not confirm, this desk will be marked Abandoned and released to other students.
+            If you do not confirm, this desk will be released to other students.
           </p>
         </div>
 

@@ -26,34 +26,14 @@ const initialDesks = Array.from({ length: 30 }, (_, index) => {
       occupiedAt: new Date(Date.now() - 1500000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
-  if (id === 15) {
-    return {
-      id,
-      status: 'abandoned',
-      studentId: 'ST-9012',
-      timer: 0,
-      maxTimer: 2700,
-      occupiedAt: new Date(Date.now() - 4000000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-  }
   if (id === 24) {
     return {
       id,
       status: 'away',
       studentId: 'ST-3351',
-      timer: 45, // 45 seconds left - almost abandoned!
+      timer: 45, // 45 seconds left
       maxTimer: 1200,
       occupiedAt: new Date(Date.now() - 2000000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-  }
-  if (id === 27) {
-    return {
-      id,
-      status: 'abandoned',
-      studentId: 'ST-4022',
-      timer: 0,
-      maxTimer: 2700,
-      occupiedAt: new Date(Date.now() - 3600000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
   return {
@@ -69,27 +49,13 @@ const initialDesks = Array.from({ length: 30 }, (_, index) => {
 const initialTriggers = [
   {
     id: 1,
-    time: new Date(Date.now() - 3600000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    deskId: 27,
-    type: 'abandoned',
-    message: 'Desk 27 marked Abandoned - Hoarding auto-expiry reached.',
-  },
-  {
-    id: 2,
-    time: new Date(Date.now() - 2500000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    deskId: 15,
-    type: 'abandoned',
-    message: 'Desk 15 marked Abandoned - Idle sensor triggered.',
-  },
-  {
-    id: 3,
     time: new Date(Date.now() - 1500000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     deskId: 8,
     type: 'away',
     message: 'Desk 8 marked Away - Student ST-2089 set status to Away.',
   },
   {
-    id: 4,
+    id: 2,
     time: new Date(Date.now() - 900000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     deskId: 3,
     type: 'check_in',
@@ -137,7 +103,7 @@ export const DeskProvider = ({ children }) => {
     const interval = setInterval(() => {
       setDesks(prevDesks => {
         return prevDesks.map(desk => {
-          if (desk.status === 'free' || desk.status === 'abandoned') return desk;
+          if (desk.status === 'free') return desk;
 
           const speed = speedRef.current;
           const nextTimer = Math.max(0, desk.timer - speed);
@@ -145,21 +111,25 @@ export const DeskProvider = ({ children }) => {
           // Transition occupied/away to next states when timer reaches 0
           if (nextTimer === 0) {
             if (desk.status === 'away') {
-              // Away desk timer expired -> becomes abandoned
-              addLog(desk.id, 'abandoned', `Desk ${desk.id} marked Abandoned - Away timer expired.`);
+              addLog(desk.id, 'release', `Desk ${desk.id} released - Away timer expired.`);
               return {
                 ...desk,
-                status: 'abandoned',
+                status: 'free',
+                studentId: null,
                 timer: 0,
+                maxTimer: 0,
+                occupiedAt: null,
               };
             }
             if (desk.status === 'occupied') {
-              // Occupied timer expired -> becomes abandoned (or prompt warning triggered, for demo we set abandoned)
-              addLog(desk.id, 'abandoned', `Desk ${desk.id} marked Abandoned - Reservation expired.`);
+              addLog(desk.id, 'release', `Desk ${desk.id} released - Reservation expired.`);
               return {
                 ...desk,
-                status: 'abandoned',
+                status: 'free',
+                studentId: null,
                 timer: 0,
+                maxTimer: 0,
+                occupiedAt: null,
               };
             }
           }
@@ -196,16 +166,18 @@ export const DeskProvider = ({ children }) => {
           const speed = speedRef.current;
           const nextTime = Math.max(0, prev - speed);
           if (nextTime === 0) {
-            // Still here modal timed out! Free the desk or mark as abandoned
             setShowStillHereModal(false);
             setDesks(prevDesks => {
               return prevDesks.map(d => {
                 if (d.id === stillHereDeskId) {
-                  addLog(d.id, 'abandoned', `Desk ${d.id} marked Abandoned - Failed "Still Here" check.`);
+                  addLog(d.id, 'release', `Desk ${d.id} released - Failed "Still Here" check.`);
                   return {
                     ...d,
-                    status: 'abandoned',
+                    status: 'free',
+                    studentId: null,
                     timer: 0,
+                    maxTimer: 0,
+                    occupiedAt: null,
                   };
                 }
                 return d;
@@ -334,10 +306,12 @@ export const DeskProvider = ({ children }) => {
     addLog(deskId, 'reset', `Librarian manually reset Desk ${deskId}.`);
   };
 
-  const resetAllAbandoned = () => {
+  const resetAllOccupied = () => {
+    const occupiedDeskCount = desks.filter(d => d.status !== 'free').length;
+
     setDesks(prev =>
       prev.map(d =>
-        d.status === 'abandoned'
+        d.status !== 'free'
           ? {
               ...d,
               status: 'free',
@@ -349,15 +323,11 @@ export const DeskProvider = ({ children }) => {
           : d
       )
     );
-    // If current student desk was abandoned, clear it
-    setDesks(curr => {
-      const abandonedIds = curr.filter(d => d.status === 'abandoned').map(d => d.id);
-      if (currentStudentDesk && abandonedIds.includes(currentStudentDesk)) {
-        setCurrentStudentDesk(null);
-      }
-      return curr;
-    });
-    addLog(0, 'reset', 'Librarian reset all abandoned desks.');
+
+    setCurrentStudentDesk(null);
+    setShowStillHereModal(false);
+    setStillHereDeskId(null);
+    addLog(0, 'reset', `Librarian reset all occupied desks (${occupiedDeskCount} cleared).`);
   };
 
   // Demo Helpers
@@ -387,24 +357,6 @@ export const DeskProvider = ({ children }) => {
     addLog(deskId, 'warning', `DEMO: Manually triggered Still Here alert for Desk ${deskId}.`);
   };
 
-  const simulateHoardingSensor = (deskId) => {
-    // Student leaves things but is away -> mark as abandoned directly (hoarding sensor idle)
-    setDesks(prev =>
-      prev.map(d =>
-        d.id === deskId
-          ? {
-              ...d,
-              status: 'abandoned',
-              timer: 0,
-              studentId: d.studentId || 'ST-HOARD',
-              occupiedAt: d.occupiedAt || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-          : d
-      )
-    );
-    addLog(deskId, 'abandoned', `Desk ${deskId} sensor detected hoard behavior (no user motion for 15m).`);
-  };
-
   const confirmStillHere = () => {
     if (stillHereDeskId) {
       setDesks(prev =>
@@ -430,7 +382,6 @@ export const DeskProvider = ({ children }) => {
     free: desks.filter(d => d.status === 'free').length,
     occupied: desks.filter(d => d.status === 'occupied').length,
     away: desks.filter(d => d.status === 'away').length,
-    abandoned: desks.filter(d => d.status === 'abandoned').length,
   };
 
   return (
@@ -459,9 +410,8 @@ export const DeskProvider = ({ children }) => {
         setAway,
         releaseDesk,
         resetDesk,
-        resetAllAbandoned,
+        resetAllOccupied,
         triggerStillHereAlert,
-        simulateHoardingSensor,
         confirmStillHere,
       }}
     >

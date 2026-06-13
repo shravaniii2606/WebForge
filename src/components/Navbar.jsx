@@ -2,14 +2,15 @@ import React from 'react';
 import { useDesks } from '../context/DeskContext';
 
 export default function Navbar() {
-  const { currentView, setCurrentView, currentStudentDesk, stats, userRole, currentUser, logout } = useDesks();
+  const { currentView, setCurrentView, currentStudentDesk, userRole, currentUser, logout } = useDesks();
 
   // Define navigation items dynamically based on role
   const getNavItems = () => {
     const items = [{ id: 'landing', label: 'Home' }];
 
-    // Both guest and authenticated roles get the map
-    items.push({ id: 'map', label: 'Library Map' });
+    if (currentView !== 'landing' || userRole === 'librarian') {
+      items.push({ id: 'map', label: 'Library Map' });
+    }
 
     // Students get a dedicated QR scanner page
     if (userRole === 'student') {
@@ -50,8 +51,6 @@ export default function Navbar() {
         <div className="flex flex-wrap justify-center items-center gap-2 bg-navy-950/60 p-1.5 rounded-xl border border-navy-800">
           {navItems.map((item) => {
             const isActive = currentView === item.id;
-            const isLibrarian = item.id === 'librarian';
-            const showAbandonedBadge = isLibrarian && stats.abandoned > 0;
 
             return (
               <button
@@ -65,11 +64,6 @@ export default function Navbar() {
               >
                 <span className="relative z-10 flex items-center gap-1.5">
                   {item.label}
-                  {showAbandonedBadge && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white animate-pulse">
-                      {stats.abandoned}
-                    </span>
-                  )}
                 </span>
               </button>
             );
