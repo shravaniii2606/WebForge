@@ -13,7 +13,6 @@ export default function LibraryMapScreen() {
     currentUser,
     setAway,
     releaseDesk,
-    simulateHoardingSensor,
   } = useDesks();
 
   const selectedDesk = desks.find((d) => d.id === selectedDeskId);
@@ -47,13 +46,6 @@ export default function LibraryMapScreen() {
           label: 'Away',
           hoverBg: 'hover:bg-amber-500/30',
         };
-      case 'abandoned':
-        return {
-          bg: 'bg-slate-700/40 border-slate-500 text-slate-300',
-          dot: 'bg-slate-400',
-          label: 'Abandoned',
-          hoverBg: 'hover:bg-slate-700/60',
-        };
       default:
         return {
           bg: 'bg-navy-800 border-navy-700 text-slate-400',
@@ -76,8 +68,6 @@ export default function LibraryMapScreen() {
         checkIn(deskId, `ST-LIBR`);
       }
       setAway(deskId);
-    } else if (newStatus === 'abandoned') {
-      simulateHoardingSensor(deskId);
     }
   };
 
@@ -129,15 +119,11 @@ export default function LibraryMapScreen() {
             <span className="h-3.5 w-3.5 rounded bg-amber-500 border border-amber-400"></span>
             <span className="text-slate-300">Away</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-slate-600 border border-slate-500"></span>
-            <span className="text-slate-300">Abandoned</span>
-          </div>
         </div>
       </div>
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-navy-850 p-4 rounded-xl border border-navy-800 text-center">
           <div className="text-2xl font-black text-white">{stats.total}</div>
           <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Total Seats</div>
@@ -153,10 +139,6 @@ export default function LibraryMapScreen() {
         <div className="bg-navy-850 p-4 rounded-xl border border-navy-800 text-center">
           <div className="text-2xl font-black text-amber-400">{stats.away}</div>
           <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Away</div>
-        </div>
-        <div className="bg-navy-850 p-4 rounded-xl border border-navy-800 text-center col-span-2 md:col-span-1">
-          <div className="text-2xl font-black text-slate-400">{stats.abandoned}</div>
-          <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Abandoned</div>
         </div>
       </div>
 
@@ -201,7 +183,7 @@ export default function LibraryMapScreen() {
                   <div className="flex items-center gap-1">
                     <span className={`h-2.5 w-2.5 rounded-full ${dot} inline-block`}></span>
                     <span className="text-[10px] font-black tracking-wider uppercase hidden sm:inline">
-                      {desk.status === 'abandoned' ? 'Abnd' : label}
+                      {label}
                     </span>
                   </div>
 
@@ -215,7 +197,7 @@ export default function LibraryMapScreen() {
                   )}
 
                   {/* Timer pill - LIBRARIAN ONLY */}
-                  {desk.status !== 'free' && desk.status !== 'abandoned' && userRole === 'librarian' && (
+                  {desk.status !== 'free' && userRole === 'librarian' && (
                     <span className="absolute top-1 right-1 text-[8px] bg-navy-950/80 px-1 py-0.5 rounded text-white font-mono leading-none">
                       {formatTime(desk.timer)}
                     </span>
@@ -275,7 +257,6 @@ export default function LibraryMapScreen() {
                       <option value="free">🟢 Free</option>
                       <option value="occupied">🔴 Occupied</option>
                       <option value="away">🟡 Away</option>
-                      <option value="abandoned">⚫ Abandoned</option>
                     </select>
                   ) : (
                     /* Standard Status Badge */
@@ -392,22 +373,6 @@ export default function LibraryMapScreen() {
                           className="py-2 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-lg text-[10px] uppercase tracking-wide transition"
                         >
                           I'm Back
-                        </button>
-                        <button
-                          onClick={() => releaseDesk(selectedDesk.id)}
-                          className="py-2 bg-navy-800 hover:bg-navy-750 border border-navy-700 text-slate-300 font-bold rounded-lg text-[10px] uppercase tracking-wide transition"
-                        >
-                          Release
-                        </button>
-                      </div>
-                    )}
-                    {selectedDesk.status === 'abandoned' && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => checkIn(selectedDesk.id, currentUser)}
-                          className="py-2 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-lg text-[10px] uppercase tracking-wide transition"
-                        >
-                          Re-claim
                         </button>
                         <button
                           onClick={() => releaseDesk(selectedDesk.id)}

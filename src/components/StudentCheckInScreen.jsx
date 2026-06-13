@@ -130,17 +130,7 @@ export default function StudentCheckInScreen() {
                   )}
                   <span className="text-[9px] text-amber-500 font-semibold block mt-1">Seat releases in 20 mins max</span>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-700/50 border border-slate-600 text-xs font-bold text-slate-300 uppercase">
-                    <span className="h-2 w-2 rounded-full bg-slate-400"></span>
-                    Abandoned
-                  </span>
-                  <p className="text-xs text-red-400 px-4 mt-2 font-medium">
-                    Seat flag generated. User left belongings but didn't respond to presence prompt.
-                  </p>
-                </div>
-              )}
+              ) : null}
             </div>
 
             {/* Actions based on Desk State & Ownership */}
@@ -220,22 +210,6 @@ export default function StudentCheckInScreen() {
                     </div>
                   )}
 
-                  {activeDesk.status === 'abandoned' && (
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => checkIn(activeDesk.id, currentUser || studentIdInput)}
-                        className="w-full py-4 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-xl shadow-lg transition duration-200"
-                      >
-                        Re-claim & Check-in
-                      </button>
-                      <button
-                        onClick={() => releaseDesk(activeDesk.id)}
-                        className="w-full py-3 bg-navy-800 hover:bg-navy-750 border border-navy-700 text-slate-300 font-semibold rounded-xl transition duration-200"
-                      >
-                        Release & Mark Free
-                      </button>
-                    </div>
-                  )}
                 </>
               )}
             </div>

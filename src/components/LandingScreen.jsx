@@ -52,7 +52,7 @@ export default function LandingScreen() {
           </h1>
 
           <p className="text-md sm:text-lg text-slate-300 font-medium max-w-xl mx-auto">
-            Fair seats for every student. Auto-expiry timers, live seating layout layouts, and automated hoarding sensor warnings.
+            Fair seats for every student. Auto-expiry timers, smart check-ins, and simple desk release controls.
           </p>
         </div>
 
@@ -86,9 +86,6 @@ export default function LandingScreen() {
                         className="w-full bg-navy-900 border border-navy-700 focus:border-primary-500 rounded-xl px-4 py-3 text-white text-sm focus:outline-none transition font-semibold"
                       />
                       {studentError && <p className="text-red-400 text-xs mt-1">{studentError}</p>}
-                      <span className="text-[10px] text-slate-500 block mt-1.5">
-                        *Tip: Use pre-filled `ST-1024` to automatically link to Desk #3!
-                      </span>
                     </div>
 
                     <button
@@ -111,7 +108,7 @@ export default function LandingScreen() {
                   </div>
                   <h3 className="text-xl font-bold text-white">Librarian Panel</h3>
                   <p className="text-slate-400 text-xs mt-1.5 mb-6">
-                    Administrator gate. Monitor all active timers, override bookings, and review hoarding sensors.
+                    Administrator gate. Monitor all active timers and override desk bookings.
                   </p>
 
                   <form onSubmit={handleLibrarianLogin} className="space-y-4">
@@ -181,20 +178,12 @@ export default function LandingScreen() {
               {/* CTA buttons based on role */}
               <div className="flex flex-col sm:flex-row justify-center items-center gap-3 max-w-sm mx-auto">
                 {userRole === 'student' ? (
-                  <>
-                    <button
-                      onClick={() => setCurrentView('map')}
-                      className="w-full py-3 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-xl text-xs uppercase tracking-wider transition"
-                    >
-                      View Live Map
-                    </button>
-                    <button
-                      onClick={() => setCurrentView('student-flow')}
-                      className="w-full py-3 bg-navy-800 hover:bg-navy-750 border border-navy-750 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition"
-                    >
-                      Check-in Portal
-                    </button>
-                  </>
+                  <button
+                    onClick={() => setCurrentView('student-flow')}
+                    className="w-full py-3 bg-primary-500 hover:bg-primary-400 text-navy-950 font-bold rounded-xl text-xs uppercase tracking-wider transition"
+                  >
+                    Check-in Portal
+                  </button>
                 ) : (
                   <>
                     <button
@@ -229,13 +218,7 @@ export default function LandingScreen() {
         </div>
 
         {/* 3-Point Value Props */}
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
-          <div className="bg-navy-850/60 backdrop-blur-sm p-6 rounded-2xl border border-navy-800">
-            <h3 className="text-lg font-bold text-white mb-2">Live Map Layouts</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Check real-time occupancy before heading in. View occupied, free, away, and recently abandoned seats instantly.
-            </p>
-          </div>
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div className="bg-navy-850/60 backdrop-blur-sm p-6 rounded-2xl border border-navy-800">
             <h3 className="text-lg font-bold text-white mb-2">Auto-Expiry Warnings</h3>
             <p className="text-slate-400 text-xs leading-relaxed">
@@ -243,7 +226,7 @@ export default function LandingScreen() {
             </p>
           </div>
           <div className="bg-navy-850/60 backdrop-blur-sm p-6 rounded-2xl border border-navy-800">
-            <h3 className="text-lg font-bold text-white mb-2">Anti-Hoarding Sensors</h3>
+            <h3 className="text-lg font-bold text-white mb-2">Live Seat Control</h3>
             <p className="text-slate-400 text-xs leading-relaxed">
               Integrated desk sensors verify student presence. System flags idle desks to the librarian to free them for others.
             </p>

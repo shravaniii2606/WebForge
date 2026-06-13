@@ -7,7 +7,6 @@ export default function DemoPanel() {
     timerSpeed,
     setTimerSpeed,
     triggerStillHereAlert,
-    simulateHoardingSensor,
     stats,
   } = useDesks();
 
@@ -38,7 +37,7 @@ export default function DemoPanel() {
           <div className="border-b border-navy-800 pb-3">
             <h4 className="font-bold text-white text-sm">Demo Simulation Deck</h4>
             <p className="text-[10px] text-slate-400 mt-0.5">
-              Simulate events and test the anti-hoarding rules instantly without waiting for real time.
+              Simulate events and test timer behavior instantly without waiting for real time.
             </p>
           </div>
 
@@ -92,13 +91,6 @@ export default function DemoPanel() {
                 <span>Trigger Still Here Alert</span>
                 <span className="text-[9px] bg-amber-500/20 px-1 py-0.5 rounded">Screen 4</span>
               </button>
-              <button
-                onClick={() => simulateHoardingSensor(selectedDeskId)}
-                className="w-full text-left px-3 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-xl text-xs font-bold transition flex justify-between items-center"
-              >
-                <span>Simulate Sensor Idle (Hoard)</span>
-                <span className="text-[9px] bg-red-500/20 px-1 py-0.5 rounded">Sensor Alert</span>
-              </button>
             </div>
           </div>
 
@@ -107,7 +99,6 @@ export default function DemoPanel() {
             <span>F: {stats.free}</span>
             <span>O: {stats.occupied}</span>
             <span>A: {stats.away}</span>
-            <span>Ab: {stats.abandoned}</span>
             <span className="text-primary-500 font-bold uppercase">Ready</span>
           </div>
         </div>
